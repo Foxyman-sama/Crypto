@@ -1,1 +1,2 @@
 add_subdirectory(сaesar)
+add_subdirectory(vigenere)

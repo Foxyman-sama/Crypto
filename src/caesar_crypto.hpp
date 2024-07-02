@@ -8,12 +8,12 @@
 
 class CaesarCryptoStrategy {
  public:
-  std::string encrypt(const std::string &str, int shift) {
-    return parse(str, shift, [this](auto ch, auto shift) { return encrypt_char(ch, shift); });
+  std::string encrypt(const std::string &str, std::any shift) {
+    return parse(str, std::any_cast<int>(shift), [this](auto ch, auto shift) { return encrypt_char(ch, shift); });
   }
 
-  std::string decrypt(const std::string &str, int shift) {
-    return parse(str, shift, [this](auto ch, auto shift) { return decrypt_char(ch, shift); });
+  std::string decrypt(const std::string &str, std::any shift) {
+    return parse(str, std::any_cast<int>(shift), [this](auto ch, auto shift) { return decrypt_char(ch, shift); });
   }
 
  private:
