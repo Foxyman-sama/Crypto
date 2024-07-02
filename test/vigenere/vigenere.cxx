@@ -18,47 +18,58 @@ class VigenereCryptoStrategy {
  private:
   std::string parse_key(const std::string &text_for_encoding, const std::any &any) {
     const auto key { extract_key(any) };
+    check_key(text_for_encoding, key);
+    return match_key_to_text(text_for_encoding, key);
+  }
+
+  std::string extract_key(const std::any &any) { return std::any_cast<const char *>(any); }
+
+  void check_key(const std::string &text_for_encoding, const std::string &key) {
+    if (text_for_encoding.length() < key.length()) {
+      throw std::runtime_error { "Key can't be longer than text." };
+    }
+
+    for (auto &&ch : key) {
+      if (std::isalpha(ch) == false) {
+        throw std::runtime_error { "Key contains non-alphabetic characters." };
+      }
+    }
+  }
+
+  std::string match_key_to_text(const std::string &text_for_encoding, const std::string &key) {
     const auto text_length { text_for_encoding.length() };
-    std::string result(text_length, '\0');
+    const auto key_length { key.length() };
+
+    std::string result;
 
     for (int i = 0, j = 0; i < text_length; ++i) {
       const char text_ch { text_for_encoding[i] };
       if (std::isspace(text_ch) || std::ispunct(text_ch)) {
-        result[i] = text_ch;
+        result += text_ch;
       } else {
-        result[i] = key[j++ % key.length()];
+        result += key[j++ % key_length];
       }
     }
 
     return result;
-  }
-
-  std::string extract_key(const std::any &any) {
-    const std::string result { std::any_cast<const char *>(any) };
-    check_key(result);
-    return result;
-  }
-
-  void check_key(const std::string &key) {
-    for (auto &&ch : key) {
-      if (std::isalpha(ch) == false) {
-        throw std::runtime_error { "Key is broken." };
-      }
-    }
   }
 
   std::string parse(const std::string &text_for_encoding, const std::string &key) {
     std::string result;
 
     for (int i = 0; i < text_for_encoding.length(); ++i) {
-      if (std::ispunct(text_for_encoding[i]) || std::isspace(text_for_encoding[i])) {
-        result += text_for_encoding[i];
-      } else {
-        result += encrypt_char(text_for_encoding[i], key[i]);
-      }
+      result += match_character(text_for_encoding[i], key[i]);
     }
 
     return result;
+  }
+
+  char match_character(const char text_ch, const char key_ch) {
+    if (std::ispunct(text_ch) || std::isspace(text_ch)) {
+      return text_ch;
+    } else {
+      return encrypt_char(text_ch, key_ch);
+    }
   }
 
   char encrypt_char(char text_ch, char key_ch) {
@@ -89,4 +100,10 @@ TEST(vigenere_encrypt_tests, error_when_key_contains_not_only_alphabet) {
   VigenereCryptoStrategy crypto;
 
   ASSERT_ANY_THROW(crypto.encrypt("HELLO, WORLD!", "BYE!"));
+}
+
+TEST(vigenere_encrypt_tests, error_when_key_is_longet_than_text) {
+  VigenereCryptoStrategy crypto;
+
+  ASSERT_ANY_THROW(crypto.encrypt("BYE", "HELLO"));
 }
