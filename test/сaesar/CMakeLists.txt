@@ -7,6 +7,10 @@ find_package(GTest REQUIRED)
 
 add_executable(${PROJECT_NAME} сaesar.cxx)
 
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}
+)
+
 target_link_libraries(${PROJECT_NAME}  
     GTest::gtest_main
     GTest::gmock_main)
