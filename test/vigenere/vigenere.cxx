@@ -86,18 +86,36 @@ class VigenereCryptoStrategy {
   }
 
   char encrypt_char(char text_ch, char key_ch) {
-    const auto encrypted { (text_ch - 'A' + key_ch - 'A') % 26 + 'A' };
-    return check_encrypt_boundary(encrypted);
+    if (text_ch >= 'a' && text_ch <= 'z') {
+      const auto encrypted { ((text_ch - 'a') + (key_ch - 'a')) % 26 + 'a' };
+      return check_encrypt_boundary_lower_case(encrypted);
+    } else if (text_ch >= 'A' && text_ch <= 'Z') {
+      const auto encrypted { ((text_ch - 'A') + (key_ch - 'A')) % 26 + 'A' };
+      return check_encrypt_boundary_upper_case(encrypted);
+    } else {
+      throw std::runtime_error { "Unknown character." };
+    }
   }
 
-  char check_encrypt_boundary(char encrypted) { return encrypted > 'Z' ? encrypted - 26 : encrypted; }
+  char check_encrypt_boundary_lower_case(char encrypted) { return encrypted > 'z' ? encrypted - 26 : encrypted; }
+
+  char check_encrypt_boundary_upper_case(char encrypted) { return encrypted > 'Z' ? encrypted - 26 : encrypted; }
 
   char decrypt_char(char text_ch, char key_ch) {
-    const auto decrypted { (text_ch - 'A' - key_ch - 'A') % 26 + 'A' };
-    return check_decrypt_boundary(decrypted);
+    if (text_ch >= 'a' && text_ch <= 'z') {
+      const auto decrypted { ((text_ch - 'a') - (key_ch - 'a')) % 26 + 'a' };
+      return check_decrypt_boundary_lower_case(decrypted);
+    } else if (text_ch >= 'A' && text_ch <= 'Z') {
+      const auto decrypted { ((text_ch - 'A') - (key_ch - 'A')) % 26 + 'A' };
+      return check_decrypt_boundary_upper_case(decrypted);
+    } else {
+      throw std::runtime_error { "Unknown character." };
+    }
   }
 
-  char check_decrypt_boundary(char decrypted) { return decrypted < 'A' ? decrypted + 26 : decrypted; }
+  char check_decrypt_boundary_lower_case(char decrypted) { return decrypted < 'a' ? decrypted + 26 : decrypted; }
+
+  char check_decrypt_boundary_upper_case(char decrypted) { return decrypted < 'A' ? decrypted + 26 : decrypted; }
 
   KeyParser key_parser;
 };
@@ -156,4 +174,20 @@ TEST(vigenere_decrypt_tests, error_when_key_is_longet_than_text) {
   VigenereCryptoStrategy crypto;
 
   ASSERT_ANY_THROW(crypto.decrypt("BYE", "ICPMM, APPPE!"));
+}
+
+TEST(vigenere_encrypt_tests, encrypt_lower_case_phrase) {
+  VigenereCryptoStrategy crypto;
+
+  const auto actual { crypto.encrypt("hello, world!", "bye") };
+
+  ASSERT_EQ("icpmm, apppe!", actual);
+}
+
+TEST(vigenere_decrypt_tests, decrypt_lower_case_phrase) {
+  VigenereCryptoStrategy crypto;
+
+  const auto actual { crypto.decrypt("icpmm, apppe!", "bye") };
+
+  ASSERT_EQ("hello, world!", actual);
 }
