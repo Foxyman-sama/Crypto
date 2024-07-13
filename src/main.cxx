@@ -1,3 +1,8 @@
 #include <iostream>
 
-int main() { std::cout << "Hello, world!\n"; }
+#include "window.hpp"
+
+int main() {
+  Window win;
+  win.show("Crypto", 800, 600);
+}
