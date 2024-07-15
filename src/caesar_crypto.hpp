@@ -4,19 +4,22 @@
 #include <cctype>
 #include <functional>
 #include <stdexcept>
-#include <string>
 
-class CaesarCryptoStrategy {
+#include "crypto_strategy.hpp"
+
+class CaesarCryptoStrategy : public CryptoStrategy {
  public:
-  std::string encrypt(const std::string &text_for_encoding, std::any any) {
+  std::string encrypt(const std::string &text_for_encoding, const std::any &any) override {
     return parse(text_for_encoding, std::any_cast<int>(any),
                  [this](auto ch, auto shift) { return encrypt_char(ch, shift); });
   }
 
-  std::string decrypt(const std::string &text_for_decoding, std::any any) {
+  std::string decrypt(const std::string &text_for_decoding, const std::any &any) override {
     return parse(text_for_decoding, std::any_cast<int>(any),
                  [this](auto ch, auto shift) { return decrypt_char(ch, shift); });
   }
+
+  bool is_key_numeric() noexcept override { return true; }
 
  private:
   std::string parse(const std::string &text, int shift, std::function<char(char, int)> policy) {

@@ -8,6 +8,8 @@
 #include <cryptopp/osrng.h>
 #include <cryptopp/rijndael.h>
 
+#include "crypto_strategy.hpp"
+
 class Utility {
  public:
   static const CryptoPP::byte *cast_to_byte(const std::string &text) {
@@ -73,19 +75,21 @@ class CryptoLibAESImplementation : public AESImplementation {
   CryptoPP::ECB_Mode<CryptoPP::AES>::Decryption decryptor;
 };
 
-class AESCryptoStrategy {
+class AESCryptoStrategy : public CryptoStrategy {
  private:
   std::shared_ptr<AESImplementation> impl;
 
  public:
   AESCryptoStrategy(AESImplementation *impl = new CryptoLibAESImplementation) : impl { impl } {}
 
-  std::string encrypt(const std::string &text_for_encoding, const std::any &any) {
+  std::string encrypt(const std::string &text_for_encoding, const std::any &any) override {
     return impl->encrypt(text_for_encoding, std::any_cast<const char *>(any));
   }
 
-  std::string decrypt(const std::string &text_for_decoding, const std::any &any) {
+  std::string decrypt(const std::string &text_for_decoding, const std::any &any) override {
     return impl->decrypt(text_for_decoding, std::any_cast<const char *>(any));
   }
+
+  bool is_key_numeric() noexcept override { return false; }
 };
 #endif

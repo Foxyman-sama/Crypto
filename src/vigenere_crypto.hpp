@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "crypto_strategy.hpp"
+
 class KeyParser {
  public:
   std::string parse(const std::string &text, const std::any &any) {
@@ -48,17 +50,19 @@ class KeyParser {
   }
 };
 
-class VigenereCryptoStrategy {
+class VigenereCryptoStrategy : public CryptoStrategy {
  public:
-  std::string encrypt(const std::string &text_for_encoding, const std::any &any) {
+  std::string encrypt(const std::string &text_for_encoding, const std::any &any) override {
     return parse(text_for_encoding, key_parser.parse(text_for_encoding, any),
                  [this](auto text_ch, auto key_ch) { return encrypt_char(text_ch, key_ch); });
   }
 
-  std::string decrypt(const std::string &text_for_decoding, const std::any &any) {
+  std::string decrypt(const std::string &text_for_decoding, const std::any &any) override {
     return parse(text_for_decoding, key_parser.parse(text_for_decoding, any),
                  [this](auto text_ch, auto key_ch) { return decrypt_char(text_ch, key_ch); });
   }
+
+  bool is_key_numeric() noexcept override { return false; }
 
  private:
   std::string parse(const std::string &text_for_encoding, const std::string &key,
