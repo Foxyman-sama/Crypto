@@ -1,18 +1,21 @@
 #include <iostream>
 
+#include "aes_crypto.hpp"
 #include "caesar_crypto.hpp"
+#include "crypto_strategies_binds.hpp"
+#include "input.hpp"
+#include "vigenere_crypto.hpp"
 #include "window.hpp"
 
-class Fake : public Input {
- public:
-  void encrypt(const std::string &crypto_name, const std::string &text_for_encoding, const std::string &key) override {}
-
- private:
-  CaesarCryptoStrategy crypto;
-};
-
 int main() {
-  Fake fake;
-  Window win { fake };
+  DataView data_view;
+
+  CryptoStrategies crypto_strategies;
+  crypto_strategies[caesar_crypto_name].reset(new CaesarCryptoStrategy);
+  crypto_strategies[vigenere_crypto_name].reset(new VigenereCryptoStrategy);
+  crypto_strategies[aes_crypto_name].reset(new AESCryptoStrategy);
+
+  CryptoInput input { data_view, std::move(crypto_strategies) };
+  Window win { input };
   win.show("Crypto", 800, 600);
 }

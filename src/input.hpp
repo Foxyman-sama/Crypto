@@ -8,20 +8,20 @@
 #include "crypto_strategy.hpp"
 #include "data_view.hpp"
 
-using CryptoStrategies = std::unordered_map<std::string, std::unique_ptr<CryptoStrategy>>;
+using CryptoStrategies = std::unordered_map<std::string_view, std::unique_ptr<CryptoStrategy>>;
 
 class Input {
  public:
-  virtual void encrypt(const std::string &crypto_name, const std::string &text_for_encoding,
-                       const std::string &key) = 0;
+  virtual void encrypt(const std::string &crypto_name, const std::string &text_for_encoding, const char *key) = 0;
 };
 
-class CryptoInput {
+class CryptoInput : public Input {
  public:
   CryptoInput(DataView &data_view, CryptoStrategies &&crypto_strategies)
       : data_view { data_view }, crypto_strategies { std::move(crypto_strategies) } {}
 
-  void encrypt(const std::string &crypto_strategy_name, const std::string &text_for_encoding, const char *key) {
+  void encrypt(const std::string &crypto_strategy_name, const std::string &text_for_encoding,
+               const char *key) override {
     auto &strategy { get_strategy(crypto_strategy_name) };
     if (strategy.is_key_numeric()) {
       encrypt_when_numeric_key(strategy, text_for_encoding, key);
