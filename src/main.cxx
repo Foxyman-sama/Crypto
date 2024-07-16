@@ -16,6 +16,6 @@ int main() {
   crypto_strategies[aes_crypto_name].reset(new AESCryptoStrategy);
 
   CryptoInput input { data_view, std::move(crypto_strategies) };
-  Window win { input };
+  Window win { input, data_view };
   win.show("Crypto", 800, 600);
 }

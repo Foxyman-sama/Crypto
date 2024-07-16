@@ -106,7 +106,7 @@ class GLFWBackendWindow {
 
 class Window : public GLFWBackendWindow {
  public:
-  Window(Input &input) : input { input } {}
+  Window(Input &input, DataView &data_view) : input { input }, data_view { data_view } {}
 
  private:
   void show_main_window() override {
@@ -133,6 +133,8 @@ class Window : public GLFWBackendWindow {
 
   void handle_buttons_clicks() {
     if (ImGui::Button(button_text, { button_elem_width, button_elem_height })) {
+      input.encrypt("caesar", input_text, "1");
+      std::cout << data_view.output_text << '\n';
     }
   }
 
@@ -148,6 +150,7 @@ class Window : public GLFWBackendWindow {
   static constexpr auto window_height { 100 };
 
   Input &input;
+  DataView &data_view;
   std::string input_text;
 };
 
