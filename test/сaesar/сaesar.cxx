@@ -25,6 +25,14 @@ TEST(caesar_encrypt_tests, encrypt_different_case_with_twenty_six_shift) {
   ASSERT_EQ("HeLlO, WoRlD", actual);
 }
 
+TEST(caesar_encrypt_tests, encrypt_different_case_with_twenty_five_shift) {
+  CaesarCryptoStrategy crypto;
+
+  const auto actual { crypto.encrypt("HeLlO, WoRlD", 25) };
+
+  ASSERT_EQ("GdKkN, VnQkC", actual);
+}
+
 TEST(caesar_exception_tests, throw_exception_when_str_contain_something_else) {
   CaesarCryptoStrategy crypto;
 

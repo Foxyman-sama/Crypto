@@ -41,7 +41,7 @@ class CaesarCryptoStrategy : public CryptoStrategy {
   }
 
   char encrypt_char(char ch, int shift) {
-    auto encrypted { ch + shift % 26 };
+    auto encrypted { ch + (shift % 26) };
     if (ch >= 'a' && ch <= 'z') {
       return check_encrypt_boundary_lower_case(encrypted);
     } else if (ch >= 'A' && ch <= 'Z') {
@@ -51,11 +51,11 @@ class CaesarCryptoStrategy : public CryptoStrategy {
     }
   }
 
-  char check_encrypt_boundary_lower_case(char encrypted) {
-    return encrypted > 'z' ? encrypted - 'z' + 'a' - 1 : encrypted;
+  char check_encrypt_boundary_lower_case(unsigned char encrypted) {
+    return encrypted > 'z' ? encrypted - 26 : encrypted;
   }
 
-  char check_encrypt_boundary_upper_case(char encrypted) {
+  char check_encrypt_boundary_upper_case(unsigned char encrypted) {
     return encrypted > 'Z' ? encrypted - 'Z' + 'A' - 1 : encrypted;
   }
 
@@ -70,11 +70,11 @@ class CaesarCryptoStrategy : public CryptoStrategy {
     }
   }
 
-  char check_decrypt_boundary_lower_case(char decrypted) {
+  char check_decrypt_boundary_lower_case(unsigned char decrypted) {
     return decrypted < 'a' ? decrypted + 'z' - 'a' + 1 : decrypted;
   }
 
-  char check_decrypt_boundary_upper_case(char decrypted) {
+  char check_decrypt_boundary_upper_case(unsigned char decrypted) {
     return decrypted < 'A' ? decrypted + 'Z' - 'A' + 1 : decrypted;
   }
 };
