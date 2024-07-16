@@ -140,10 +140,10 @@ class Window : public GLFWBackendWindow {
   }
 
   void show_inputs_titles() {
-    ImGui::Text("Text for encrypting:");
+    ImGui::Text("Text:");
     ImGui::Spacing();
     ImGui::Spacing();
-    ImGui::Text("Key for encrypting:");
+    ImGui::Text("Key:");
     ImGui::Spacing();
     ImGui::Spacing();
     ImGui::Text("Output:");
