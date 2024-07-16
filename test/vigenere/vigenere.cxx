@@ -9,14 +9,14 @@ int main() {
   return RUN_ALL_TESTS();
 }
 
-class vigenere_tests {
+class vigenere_tests : public testing::Test {
  public:
   VigenereCryptoStrategy crypto;
 };
 
-class vigenere_encrypt_tests : public testing::Test, public vigenere_tests {};
+class vigenere_encrypt_tests : public vigenere_tests {};
 
-class vigenere_decrypt_tests : public testing::Test, public vigenere_tests {};
+class vigenere_decrypt_tests : public vigenere_tests {};
 
 TEST_F(vigenere_encrypt_tests, encrypt_one_word) {
   const auto actual { crypto.encrypt("ATTACKATDAWN", "LEMON") };
