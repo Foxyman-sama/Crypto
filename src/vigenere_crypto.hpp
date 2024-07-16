@@ -68,8 +68,9 @@ class VigenereCryptoStrategy : public CryptoStrategy {
  private:
   std::string parse(const std::string &text_for_encoding, const std::string &key,
                     std::function<char(char, char)> policy) {
-    const auto text_length { text_for_encoding.length() };
+    check_case(text_for_encoding);
 
+    const auto text_length { text_for_encoding.length() };
     std::string result;
 
     for (int i = 0; i < text_length; ++i) {
@@ -77,6 +78,25 @@ class VigenereCryptoStrategy : public CryptoStrategy {
     }
 
     return result;
+  }
+
+  void check_case(const std::string &str) {
+    const auto is_total_uppercase { std::isupper(str[0]) > 0 };
+
+    for (auto &&ch : str) {
+      compare_ch_case(ch, is_total_uppercase);
+    }
+  }
+
+  void compare_ch_case(const char ch, const bool is_total_uppercase) {
+    if (std::ispunct(ch) || std::isspace(ch)) {
+      return;
+    }
+
+    const auto is_ch_uppercase { std::isupper(ch) > 0 };
+    if (is_total_uppercase != is_ch_uppercase) {
+      throw_exception(case_is_different_error);
+    }
   }
 
   char parse_character(const char text_ch, const char key_ch, std::function<char(char, char)> policy) {

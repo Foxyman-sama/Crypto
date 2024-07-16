@@ -67,3 +67,7 @@ TEST_F(vigenere_decrypt_tests, decrypt_lower_case_phrase) {
 
   ASSERT_EQ("hello, world!", actual);
 }
+
+TEST_F(vigenere_encrypt_tests, error_when_case_is_different_in_text) {
+  ASSERT_ANY_THROW(crypto.encrypt("HeLlo, world!", "bye"));
+}
