@@ -140,7 +140,6 @@ class Window : public GLFWBackendWindow {
   }
 
   void show_inputs_titles() {
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));
     ImGui::Text("Text for encrypting:");
     ImGui::Spacing();
     ImGui::Spacing();
@@ -148,7 +147,6 @@ class Window : public GLFWBackendWindow {
     ImGui::Spacing();
     ImGui::Spacing();
     ImGui::Text("Output:");
-    ImGui::PopStyleColor();
   }
 
   void show_inputs() {
@@ -160,9 +158,9 @@ class Window : public GLFWBackendWindow {
   void get_text_for_encryption() {
     ImGui::SetNextItemWidth(text_inputs_width);
 
-    std::string temp { text_for_encryption };
+    std::string temp { input_text };
     if (ImGui::InputText("###input_1", &temp)) {
-      this->text_for_encryption = temp;
+      this->input_text = temp;
     }
   }
 
@@ -185,9 +183,9 @@ class Window : public GLFWBackendWindow {
 
   void handle_input_text() {
     if (mode == WorkMode::ENCRYPTION) {
-      input.encrypt(selected_crypto_strategy, text_for_encryption, key.c_str());
+      input.encrypt(selected_crypto_strategy, input_text, key.c_str());
     } else {
-      //
+      input.decrypt(selected_crypto_strategy, input_text, key.c_str());
     }
   }
 
@@ -249,7 +247,7 @@ class Window : public GLFWBackendWindow {
   Input &input;
   DataView &data_view;
 
-  std::string text_for_encryption;
+  std::string input_text;
   std::string key;
 
   WorkMode mode;

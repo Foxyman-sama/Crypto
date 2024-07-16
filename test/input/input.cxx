@@ -49,8 +49,32 @@ TEST_F(crypto_input_tests, aes_encryption_works) {
   ASSERT_EQ("28FC955E541068C5E3F60E6505B2EF9E9E2E7847755BE5A404E3D94C05252520", data_view.output_text);
 }
 
-TEST_F(crypto_input_tests, data_view_can_contain_expection_text) {
+TEST_F(crypto_input_tests, data_view_can_contain_exсeptions_text_when_encryption) {
   input->encrypt("caesar", "1", "1");
+
+  ASSERT_THAT(data_view.output_text, HasSubstr(broken_text_error));
+}
+
+TEST_F(crypto_input_tests, caesar_decryption_works) {
+  input->decrypt("caesar", "IfMmP, XpSmE", "1");
+
+  ASSERT_EQ("HeLlO, WoRlD", data_view.output_text);
+}
+
+TEST_F(crypto_input_tests, vigenere_decryption_works) {
+  input->decrypt("vigenere", "ICPMM, APPPE!", "BYE");
+
+  ASSERT_EQ("HELLO, WORLD!", data_view.output_text);
+}
+
+TEST_F(crypto_input_tests, aes_decryption_works) {
+  input->decrypt("aes", "28FC955E541068C5E3F60E6505B2EF9E9E2E7847755BE5A404E3D94C05252520", "hellohellohelloh");
+
+  ASSERT_EQ("hellohellohelloh", data_view.output_text);
+}
+
+TEST_F(crypto_input_tests, data_view_can_contain_exсeptions_text_when_decryption) {
+  input->decrypt("caesar", "1", "1");
 
   ASSERT_THAT(data_view.output_text, HasSubstr(broken_text_error));
 }

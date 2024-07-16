@@ -69,6 +69,7 @@ class VigenereCryptoStrategy : public CryptoStrategy {
   std::string parse(const std::string &text_for_encoding, const std::string &key,
                     std::function<char(char, char)> policy) {
     check_case(text_for_encoding);
+    check_case(key);
 
     const auto text_length { text_for_encoding.length() };
     std::string result;
