@@ -8,13 +8,15 @@
 #include "src/input.hpp"
 #include "src/vigenere_crypto.hpp"
 
+using namespace testing;
+
 int main() {
-  testing::InitGoogleTest();
-  testing::InitGoogleMock();
+  InitGoogleTest();
+  InitGoogleMock();
   return RUN_ALL_TESTS();
 }
 
-class crypto_input_tests : public testing::Test {
+class crypto_input_tests : public Test {
  public:
   DataView data_view;
   CryptoStrategies crypto_strategies;
@@ -45,4 +47,10 @@ TEST_F(crypto_input_tests, aes_encryption_works) {
   input->encrypt("aes", "hellohellohelloh", "hellohellohelloh");
 
   ASSERT_EQ("28FC955E541068C5E3F60E6505B2EF9E9E2E7847755BE5A404E3D94C05252520", data_view.output_text);
+}
+
+TEST_F(crypto_input_tests, data_view_can_contain_expection_text) {
+  input->encrypt("caesar", "1", "1");
+
+  ASSERT_THAT(data_view.output_text, HasSubstr(broken_text_error));
 }

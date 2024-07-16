@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.25)
 project(vigenere_tests)
 
-set(CMAKE_CXX_STANDART 23)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CMAKE_CXX_STANDARD 23)
 
 find_package(GTest REQUIRED)
 

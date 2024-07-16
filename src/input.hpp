@@ -1,6 +1,7 @@
 #ifndef INPUT_HPP
 #define INPUT_HPP
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -22,6 +23,15 @@ class CryptoInput : public Input {
 
   void encrypt(const std::string &crypto_strategy_name, const std::string &text_for_encoding,
                const char *key) override {
+    try {
+      try_encrypt(crypto_strategy_name, text_for_encoding, key);
+    } catch (const std::exception &e) {
+      data_view.output_text = e.what();
+    }
+  }
+
+ private:
+  void try_encrypt(const std::string &crypto_strategy_name, const std::string &text_for_encoding, const char *key) {
     auto &strategy { get_strategy(crypto_strategy_name) };
     if (strategy.is_key_numeric()) {
       encrypt_when_numeric_key(strategy, text_for_encoding, key);
@@ -30,7 +40,6 @@ class CryptoInput : public Input {
     }
   }
 
- private:
   CryptoStrategy &get_strategy(const std::string &crypto_strategy_name) {
     return *crypto_strategies[crypto_strategy_name];
   }

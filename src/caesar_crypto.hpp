@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "crypto_strategy.hpp"
+#include "errors.hpp"
 
 class CaesarCryptoStrategy : public CryptoStrategy {
  public:
@@ -41,18 +42,18 @@ class CaesarCryptoStrategy : public CryptoStrategy {
   }
 
   char encrypt_char(char ch, int shift) {
-    auto encrypted { ch + (shift % 26) };
+    auto encrypted { ch + shift % 26 };
     if (ch >= 'a' && ch <= 'z') {
       return check_encrypt_boundary_lower_case(encrypted);
     } else if (ch >= 'A' && ch <= 'Z') {
       return check_encrypt_boundary_upper_case(encrypted);
     } else {
-      throw std::runtime_error { "Unknown character." };
+      throw_exception(broken_text_error);
     }
   }
 
   char check_encrypt_boundary_lower_case(unsigned char encrypted) {
-    return encrypted > 'z' ? encrypted - 26 : encrypted;
+    return encrypted > 'z' ? encrypted - 'z' + 'a' - 1 : encrypted;
   }
 
   char check_encrypt_boundary_upper_case(unsigned char encrypted) {
@@ -66,7 +67,7 @@ class CaesarCryptoStrategy : public CryptoStrategy {
     } else if (ch >= 'A' && ch <= 'Z') {
       return check_decrypt_boundary_upper_case(decrypted);
     } else {
-      throw std::runtime_error { "Unknown character." };
+      throw_exception(broken_text_error);
     }
   }
 

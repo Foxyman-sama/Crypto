@@ -7,6 +7,7 @@
 #include <string>
 
 #include "crypto_strategy.hpp"
+#include "errors.hpp"
 
 class KeyParser {
  public:
@@ -21,12 +22,12 @@ class KeyParser {
 
   void check_key(const std::string &text, const std::string &key) {
     if (text.length() < key.length()) {
-      throw std::runtime_error { "Key can't be longer than text." };
+      throw_exception(key_longer_than_text_error);
     }
 
     for (auto &&ch : key) {
       if (std::isalpha(ch) == false) {
-        throw std::runtime_error { "Key contains non-alphabetic characters." };
+        throw_exception(key_contains_non_alphabetic_chars_error);
       }
     }
   }
@@ -94,7 +95,7 @@ class VigenereCryptoStrategy : public CryptoStrategy {
       const auto encrypted { ((text_ch - 'A') + (key_ch - 'A')) % 26 + 'A' };
       return check_encrypt_boundary_upper_case(encrypted);
     } else {
-      throw std::runtime_error { "Unknown character." };
+      throw_exception(broken_text_error);
     }
   }
 
@@ -110,7 +111,7 @@ class VigenereCryptoStrategy : public CryptoStrategy {
       const auto decrypted { ((text_ch - 'A') - (key_ch - 'A')) % 26 + 'A' };
       return check_decrypt_boundary_upper_case(decrypted);
     } else {
-      throw std::runtime_error { "Unknown character." };
+      throw_exception(broken_text_error);
     }
   }
 

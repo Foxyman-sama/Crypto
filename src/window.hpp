@@ -106,34 +106,49 @@ class GLFWBackendWindow {
 
 class Window : public GLFWBackendWindow {
  public:
-  Window(Input &input, DataView &data_view) : input { input }, data_view { data_view } {}
+  Window(Input &input, DataView &data_view) : input { input }, data_view { data_view }, mode { WorkMode::ENCRYPTION } {}
 
  private:
+  enum class WorkMode { ENCRYPTION, DECRYPTION };
+
   void show_main_window() override {
     ImGui::SetNextWindowSize({ window_width, window_height });
     ImGui::Begin("Crypto", nullptr);
-
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));
-    ImGui::Text("Text for encrypting:");
-    ImGui::SameLine();
-    get_text_for_encryption();
-
-    ImGui::Spacing();
-    ImGui::Text("Key for encrypting: ");
-    ImGui::SameLine();
-    get_key();
-
-    ImGui::Spacing();
-    ImGui::Text("Output:             ");
-    ImGui::SameLine();
-    show_output_text();
-    ImGui::PopStyleColor();
-
-    ImGui::Spacing();
-    Alignment::center_by_width(button_elem_width);
-    handle_buttons_clicks();
+    show_crypto_input_table();
+    show_settings_table();
+    show_button();
 
     ImGui::End();
+  }
+
+  void show_crypto_input_table() {
+    if (ImGui::BeginTable("CryptoInput", 2)) {
+      ImGui::TableNextColumn();
+      show_inputs_titles();
+
+      ImGui::TableNextColumn();
+      show_inputs();
+
+      ImGui::EndTable();
+    }
+  }
+
+  void show_inputs_titles() {
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));
+    ImGui::Text("Text for encrypting:");
+    ImGui::Spacing();
+    ImGui::Spacing();
+    ImGui::Text("Key for encrypting:");
+    ImGui::Spacing();
+    ImGui::Spacing();
+    ImGui::Text("Output:");
+    ImGui::PopStyleColor();
+  }
+
+  void show_inputs() {
+    get_text_for_encryption();
+    get_key();
+    show_output_text();
   }
 
   void get_text_for_encryption() {
@@ -154,19 +169,53 @@ class Window : public GLFWBackendWindow {
     }
   }
 
-  void handle_buttons_clicks() {
+  void show_button() {
+    ImGui::Spacing();
+    Alignment::center_by_width(button_elem_width);
     if (ImGui::Button(button_text, { button_elem_width, button_elem_height })) {
+      handle_input_text();
+    }
+  }
+
+  void handle_input_text() {
+    if (mode == WorkMode::ENCRYPTION) {
       input.encrypt("caesar", text_for_encryption, key.c_str());
-      std::cout << data_view.output_text << '\n';
+    } else {
+      //
     }
   }
 
   void show_output_text() {
     ImGui::SetNextItemWidth(input_elem_width);
-    ImGui::InputText("###output", &data_view.output_text);
+    ImGui::InputTextMultiline("###output", &data_view.output_text);
   }
 
- private:
+  void show_settings_table() {
+    if (ImGui::BeginTable("Settings", 2)) {
+      ImGui::TableNextColumn();
+      if (ImGui::TreeNode("Crypto Mode")) {
+        show_crypto_selection();
+        ImGui::TreePop();
+      }
+
+      ImGui::TableNextColumn();
+
+      ImGui::EndTable();
+    }
+  }
+
+  void show_crypto_selection() {
+    static auto selected { 0 };
+
+    if (ImGui::Selectable("Encrypt", selected == 0)) {
+      mode = WorkMode::ENCRYPTION;
+      selected = 0;
+    } else if (ImGui::Selectable("Decrypt", selected == 1)) {
+      mode = WorkMode::DECRYPTION;
+      selected = 1;
+    }
+  }
+
   static constexpr auto text_input_length { 100 };
   static constexpr auto input_elem_width { 200 };
 
@@ -176,14 +225,16 @@ class Window : public GLFWBackendWindow {
   static constexpr auto button_elem_width { 200 };
   static constexpr auto button_elem_height { 20 };
 
-  static constexpr auto window_width { 375 };
-  static constexpr auto window_height { 150 };
+  static constexpr auto window_width { 450 };
+  static constexpr auto window_height { 300 };
 
   Input &input;
   DataView &data_view;
 
   std::string text_for_encryption;
   std::string key;
+
+  WorkMode mode;
 };
 
 #endif
