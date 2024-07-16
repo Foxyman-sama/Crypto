@@ -9,6 +9,7 @@
 
 #include <memory>
 
+#include "crypto_strategies_binds.hpp"
 #include "input.hpp"
 
 class Alignment {
@@ -106,7 +107,11 @@ class GLFWBackendWindow {
 
 class Window : public GLFWBackendWindow {
  public:
-  Window(Input &input, DataView &data_view) : input { input }, data_view { data_view }, mode { WorkMode::ENCRYPTION } {}
+  Window(Input &input, DataView &data_view)
+      : input { input },
+        data_view { data_view },
+        mode { WorkMode::ENCRYPTION },
+        selected_crypto_strategy { crypto_strategies_binds[0] } {}
 
  private:
   enum class WorkMode { ENCRYPTION, DECRYPTION };
@@ -114,6 +119,7 @@ class Window : public GLFWBackendWindow {
   void show_main_window() override {
     ImGui::SetNextWindowSize({ window_width, window_height });
     ImGui::Begin("Crypto", nullptr);
+
     show_crypto_input_table();
     show_settings_table();
     show_button();
@@ -152,7 +158,7 @@ class Window : public GLFWBackendWindow {
   }
 
   void get_text_for_encryption() {
-    ImGui::SetNextItemWidth(input_elem_width);
+    ImGui::SetNextItemWidth(text_inputs_width);
 
     std::string temp { text_for_encryption };
     if (ImGui::InputText("###input_1", &temp)) {
@@ -161,7 +167,7 @@ class Window : public GLFWBackendWindow {
   }
 
   void get_key() {
-    ImGui::SetNextItemWidth(input_elem_width);
+    ImGui::SetNextItemWidth(text_inputs_width);
 
     std::string temp { key };
     if (ImGui::InputText("###input_2", &temp)) {
@@ -179,14 +185,14 @@ class Window : public GLFWBackendWindow {
 
   void handle_input_text() {
     if (mode == WorkMode::ENCRYPTION) {
-      input.encrypt("caesar", text_for_encryption, key.c_str());
+      input.encrypt(selected_crypto_strategy, text_for_encryption, key.c_str());
     } else {
       //
     }
   }
 
   void show_output_text() {
-    ImGui::SetNextItemWidth(input_elem_width);
+    ImGui::SetNextItemWidth(text_inputs_width);
     ImGui::InputTextMultiline("###output", &data_view.output_text);
   }
 
@@ -199,6 +205,10 @@ class Window : public GLFWBackendWindow {
       }
 
       ImGui::TableNextColumn();
+      if (ImGui::TreeNode("Crypto Strategy")) {
+        show_crypto_strategy_selection();
+        ImGui::TreePop();
+      }
 
       ImGui::EndTable();
     }
@@ -216,10 +226,18 @@ class Window : public GLFWBackendWindow {
     }
   }
 
-  static constexpr auto text_input_length { 100 };
-  static constexpr auto input_elem_width { 200 };
+  void show_crypto_strategy_selection() {
+    static auto selected { 0 };
 
-  static constexpr auto output_elem_width { 200 };
+    for (auto i { 0 }; i < crypto_strategies_binds.size(); ++i) {
+      if (ImGui::Selectable(crypto_strategies_binds[i].data(), selected == i)) {
+        selected_crypto_strategy = crypto_strategies_binds[i];
+        selected = i;
+      }
+    }
+  }
+
+  static constexpr auto text_inputs_width { 200 };
 
   static constexpr auto button_text { "Execute" };
   static constexpr auto button_elem_width { 200 };
@@ -235,6 +253,7 @@ class Window : public GLFWBackendWindow {
   std::string key;
 
   WorkMode mode;
+  std::string_view selected_crypto_strategy;
 };
 
 #endif

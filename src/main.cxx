@@ -11,9 +11,9 @@ int main() {
   DataView data_view;
 
   CryptoStrategies crypto_strategies;
-  crypto_strategies[caesar_crypto_name].reset(new CaesarCryptoStrategy);
-  crypto_strategies[vigenere_crypto_name].reset(new VigenereCryptoStrategy);
-  crypto_strategies[aes_crypto_name].reset(new AESCryptoStrategy);
+  crypto_strategies[crypto_strategies_binds[0]].reset(new CaesarCryptoStrategy);
+  crypto_strategies[crypto_strategies_binds[1]].reset(new VigenereCryptoStrategy);
+  crypto_strategies[crypto_strategies_binds[2]].reset(new AESCryptoStrategy);
 
   CryptoInput input { data_view, std::move(crypto_strategies) };
   Window win { input, data_view };

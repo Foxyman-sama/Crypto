@@ -13,7 +13,7 @@ using CryptoStrategies = std::unordered_map<std::string_view, std::unique_ptr<Cr
 
 class Input {
  public:
-  virtual void encrypt(const std::string &crypto_name, const std::string &text_for_encoding, const char *key) = 0;
+  virtual void encrypt(const std::string_view &crypto_name, const std::string &text_for_encoding, const char *key) = 0;
 };
 
 class CryptoInput : public Input {
@@ -21,7 +21,7 @@ class CryptoInput : public Input {
   CryptoInput(DataView &data_view, CryptoStrategies &&crypto_strategies)
       : data_view { data_view }, crypto_strategies { std::move(crypto_strategies) } {}
 
-  void encrypt(const std::string &crypto_strategy_name, const std::string &text_for_encoding,
+  void encrypt(const std::string_view &crypto_strategy_name, const std::string &text_for_encoding,
                const char *key) override {
     try {
       try_encrypt(crypto_strategy_name, text_for_encoding, key);
@@ -31,7 +31,8 @@ class CryptoInput : public Input {
   }
 
  private:
-  void try_encrypt(const std::string &crypto_strategy_name, const std::string &text_for_encoding, const char *key) {
+  void try_encrypt(const std::string_view &crypto_strategy_name, const std::string &text_for_encoding,
+                   const char *key) {
     auto &strategy { get_strategy(crypto_strategy_name) };
     if (strategy.is_key_numeric()) {
       encrypt_when_numeric_key(strategy, text_for_encoding, key);
@@ -40,7 +41,7 @@ class CryptoInput : public Input {
     }
   }
 
-  CryptoStrategy &get_strategy(const std::string &crypto_strategy_name) {
+  CryptoStrategy &get_strategy(const std::string_view &crypto_strategy_name) {
     return *crypto_strategies[crypto_strategy_name];
   }
 
